@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Розрахунок середнього стажу роботи</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            width: 50%;
+            margin: 0 auto;
+            padding: 20px;
+            border: 1px solid #f10f0f;
+            border-radius: 8px;
+        }
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+        input[type="text"], input[type="date"] {
+            width: 100%;
+            padding: 8px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+            box-shadow: 5px 5px 5px #531bd8;
+        }
+        .result, .history {
+            margin-top: 20px;
+            font-weight: bold;
+        }
+        .history {
+            margin-top: 10px;
+            font-size: 14px;
+        }
+        .history-item {
+            border-top: 1px solid #ccc;
+            padding-top: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Введіть дані співробітників</h1>
+    <form id="employeeForm">
+        <div id="employees">
+            <!-- Дані співробітників будуть додаватися тут -->
+            <div class="employee">
+                <label for="name1">Прізвище співробітника 1:</label>
+                <input type="text" id="name1" name="name1" required>
+                <label for="date1">Дата прийому на роботу 1:</label>
+                <input type="date" id="date1" name="date1" required>
+            </div>
+            <div class="employee">
+                <label for="name2">Прізвище співробітника 2:</label>
+                <input type="text" id="name2" name="name2" required>
+                <label for="date2">Дата прийому на роботу 2:</label>
+                <input type="date" id="date2" name="date2" required>
+            </div>
+            <div class="employee">
+                <label for="name3">Прізвище співробітника 3:</label>
+                <input type="text" id="name3" name="name3" required>
+                <label for="date3">Дата прийому на роботу 3:</label>
+                <input type="date" id="date3" name="date3" required>
+            </div>
+            <div class="employee">
+                <label for="name4">Прізвище співробітника 4:</label>
+                <input type="text" id="name4" name="name4" required>
+                <label for="date4">Дата прийому на роботу 4:</label>
+                <input type="date" id="date4" name="date4" required>
+            </div>
+            <div class="employee">
+                <label for="name5">Прізвище співробітника 5:</label>
+                <input type="text" id="name5" name="name5" required>
+                <label for="date5">Дата прийому на роботу 5:</label>
+                <input type="date" id="date5" name="date5" required>
+            </div>
+        </div>
+        <button type="button" onclick="calculateAverageExperience()">Розрахувати середній стаж</button>
+    </form>
+    
+    <div class="result" id="result"></div>
+    <div class="history" id="history">
+        <h2>Історія запитів</h2>
+    </div>
+</div>
+
+<script>
+    function calculateAverageExperience() {
+        const currentDate = new Date();
+        let totalYears = 0;
+        let count = 0;
+        const employeesData = [];
+        // Перевірка всіх полів для введення дати
+        for (let i = 1; i <= 5; i++) {
+            const dateInput = document.getElementById(`date${i}`).value;
+            if (dateInput) {
+                const startDate = new Date(dateInput);
+                let yearsOfExperience = currentDate.getFullYear() - startDate.getFullYear();
+
+                // Коригуємо, якщо дата прийому вже була після цього року
+                if (currentDate.getMonth() < startDate.getMonth() || (currentDate.getMonth() === startDate.getMonth() && currentDate.getDate() < startDate.getDate())) {
+                    yearsOfExperience -= 1;
+                }
+
+                totalYears += yearsOfExperience;
+                count++;
+                generateCSV(employeesData);
+            }
+        }
+
+        // Обчислення середнього стажу роботи
+        const resultDiv = document.getElementById('result');
+        if (count > 0) {
+            const averageExperience = Math.floor(totalYears / count);
+            const resultText = `Середній стаж роботи: ${averageExperience} років.`;
+            resultDiv.innerText = resultText;
+            
+        } else {
+            const resultText = 'Будь ласка, введіть дати прийому на роботу для всіх співробітників.';
+            resultDiv.innerText = resultText;
+            
+        }
+    }
+    function generateCSV(data) {
+        let csvContent = "Прізвище,Стаж роботи (років)\n";
+
+        data.forEach(employee => {
+            csvContent += `${employee.name},${employee.experience}\n`;
+        });
+
+        // Створюємо посилання для завантаження CSV
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const link = document.createElement('a');
+        const url = URL.createObjectURL(blob);
+        link.setAttribute('href', url);
+        link.setAttribute('download', 'employee_experience.csv');
+        link.style.display = 'none';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    }
+    
+</script>
+
+</body>
+</html>
